@@ -1,0 +1,289 @@
+﻿{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "value": "westus2"
+        },
+        "networkInterfaceName": {
+            "type": "string",
+            "value": "testname623"
+        },
+        "networkSecurityGroupName": {
+            "type": "string",
+            "value": "testname-nsg"
+        },
+        "networkSecurityGroupRules": {
+            "type": "array",
+            "value": []
+        },
+        "subnetName": {
+            "type": "string",
+            "value": "default"
+        },
+        "vNetName": {
+            "type": "string",
+            "value": "rg-morrisa-vnet"
+        },
+        "addressPrefixes": {
+            "type": "array",
+            "value": [
+                "10.1.5.0/24"
+            ]
+        },
+        "subnets": {
+            "type": "array",
+            "value": [
+                {
+                    "name": "default",
+                    "properties": {
+                        "addressPrefix": "10.1.5.0/24"
+                    }
+                }
+            ]
+        },
+        "operatingSystem": {
+            "type": "string",
+            "value": "Linux"
+        },
+        "application": {
+            "type": "string",
+            "value": "Application"
+        },
+        "environment": {
+            "type": "string",
+            "value": "Environment"
+        },
+        "businessUnit": {
+            "type": "string",
+            "value": "BusinessUnit"
+        },
+        "costCenter": {
+            "type": "string",
+            "value": "CostCenter"
+        },
+        "publicIpAddressName": {
+            "type": "string",
+            "value": "testname-ip"
+        },
+        "publicIpAddressType": {
+            "type": "string",
+            "value": "Dynamic"
+        },
+        "publicIpAddressSku": {
+            "type": "string",
+            "value": "Basic"
+        },
+        "virtualMachineName": {
+            "type": "string",
+            "value": "testname"
+        },
+        "virtualMachineRG": {
+            "type": "string",
+            "value": "rg-morrisa"
+        },
+        "osDiskType": {
+            "type": "string",
+            "value": "StandardSSD_LRS"
+        },
+        "virtualMachineSize": {
+            "type": "string",
+            "value": "Standard_D2_v3"
+        },
+        "adminUsername": {
+            "type": "string",
+            "value": "psjhadm"
+        },
+        "virtualMachineAdminPassword": {
+            "type": "securestring",
+            "value": null
+        },
+        "diagnosticsStorageAccountName": {
+            "type": "string",
+            "value": "rgmorrisadiag"
+        },
+        "diagnosticsStorageAccountId": {
+            "type": "string",
+            "value": "Microsoft.Storage/storageAccounts/rgmorrisadiag"
+        },
+        "diagnosticsStorageAccountType": {
+            "type": "string",
+            "value": "Standard_LRS"
+        },
+        "diagnosticsStorageAccountKind": {
+            "type": "string",
+            "value": "Storage"
+        }
+    },
+    "variables": {
+        "nsgId": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]",
+        "vnetId": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks', parameters('vNetName'))]",
+        "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]"
+    },
+    "resources": [
+        {
+            "name": "[parameters('networkInterfaceName')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2018-10-01",
+            "location": "[parameters('location')]",
+            "tags": {
+                "Application": "[parameters('application')]",
+                "Environment": "[parameters('environment')]",
+                "BusinessUnit": "[parameters('businessUnit')]",
+                "CostCenter": "[parameters('costCenter')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('vNetName'))]",
+                "[concat('Microsoft.Network/publicIpAddresses/', parameters('publicIpAddressName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIpAddress": {
+                                "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIpAddresses', parameters('publicIpAddressName'))]"
+                            }
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+                    "id": "[variables('nsgId')]"
+                }
+            }
+        },
+        {
+            "name": "[parameters('networkSecurityGroupName')]",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2019-02-01",
+            "location": "[parameters('location')]",
+            "tags": {
+                "Application": "[parameters('application')]",
+                "Environment": "[parameters('environment')]",
+                "BusinessUnit": "[parameters('businessUnit')]",
+                "CostCenter": "[parameters('costCenter')]"
+            },
+            "properties": {
+                "securityRules": "[parameters('networkSecurityGroupRules')]"
+            }
+        },
+        {
+            "name": "[parameters('vNetName')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2019-04-01",
+            "location": "[parameters('location')]",
+            "tags": {
+                "Application": "[parameters('application')]",
+                "Environment": "[parameters('environment')]",
+                "BusinessUnit": "[parameters('businessUnit')]",
+                "CostCenter": "[parameters('costCenter')]"
+            },
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": "[parameters('addressPrefixes')]"
+                },
+                "subnets": "[parameters('subnets')]"
+            }
+        },
+        {
+            "name": "[parameters('publicIpAddressName')]",
+            "type": "Microsoft.Network/publicIpAddresses",
+            "apiVersion": "2019-02-01",
+            "location": "[parameters('location')]",
+            "tags": {
+                "Application": "[parameters('application')]",
+                "Environment": "[parameters('environment')]",
+                "BusinessUnit": "[parameters('businessUnit')]",
+                "CostCenter": "[parameters('costCenter')]"
+            },
+            "properties": {
+                "publicIpAllocationMethod": "[parameters('publicIpAddressType')]"
+            },
+            "sku": {
+                "name": "[parameters('publicIpAddressSku')]"
+            }
+        },
+        {
+            "name": "[parameters('virtualMachineName')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2018-10-01",
+            "location": "[parameters('location')]",
+            "tags": {
+                "Application": "[parameters('application')]",
+                "Environment": "[parameters('environment')]",
+                "BusinessUnit": "[parameters('businessUnit')]",
+                "CostCenter": "[parameters('costCenter')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', parameters('networkInterfaceName'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', parameters('diagnosticsStorageAccountName'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('virtualMachineSize')]"
+                },
+                "storageProfile": {
+                    "osDisk": {
+                        "createOption": "FromImage",
+                        "managedDisk": {
+                            "storageAccountType": "[parameters('osDiskType')]"
+                        }
+                    },
+                    "imageReference": {
+                        "publisher": "RedHat",
+                        "offer": "RHEL",
+                        "sku": "7.3",
+                        "version": "latest"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaceName'))]"
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "computerName": "[parameters('virtualMachineName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('virtualMachineAdminPassword')]"
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[concat('https://', parameters('diagnosticsStorageAccountName'), '.blob.core.windows.net/')]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "[parameters('diagnosticsStorageAccountName')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2018-07-01",
+            "location": "[parameters('location')]",
+            "tags": {
+                "Application": "[parameters('application')]",
+                "Environment": "[parameters('environment')]",
+                "BusinessUnit": "[parameters('businessUnit')]",
+                "CostCenter": "[parameters('costCenter')]"
+            },
+            "properties": {},
+            "kind": "[parameters('diagnosticsStorageAccountKind')]",
+            "sku": {
+                "name": "[parameters('diagnosticsStorageAccountType')]"
+            }
+        }
+    ],
+    "outputs": {
+        "adminUsername": {
+            "type": "string",
+            "value": "[parameters('adminUsername')]"
+        }
+    }
+}
