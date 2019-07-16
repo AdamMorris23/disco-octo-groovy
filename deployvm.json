@@ -1,40 +1,40 @@
-﻿{
+{
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "location": {
             "type": "string",
-            "value": "westus2"
+            "defaultValue": "westus2"
         },
         "networkInterfaceName": {
             "type": "string",
-            "value": "testname623"
+            "defaultValue": "testname623"
         },
         "networkSecurityGroupName": {
             "type": "string",
-            "value": "testname-nsg"
+            "defaultValue": "testname-nsg"
         },
         "networkSecurityGroupRules": {
             "type": "array",
-            "value": []
+            "defaultValue": []
         },
         "subnetName": {
             "type": "string",
-            "value": "default"
+            "defaultValue": "default"
         },
         "vNetName": {
             "type": "string",
-            "value": "rg-morrisa-vnet"
+            "defaultValue": "rg-morrisa-vnet"
         },
         "addressPrefixes": {
             "type": "array",
-            "value": [
+            "defaultValue": [
                 "10.1.5.0/24"
             ]
         },
         "subnets": {
             "type": "array",
-            "value": [
+            "defaultValue": [
                 {
                     "name": "default",
                     "properties": {
@@ -45,75 +45,75 @@
         },
         "operatingSystem": {
             "type": "string",
-            "value": "Linux"
+            "defaultValue": "Linux"
         },
         "application": {
             "type": "string",
-            "value": "Application"
+            "defaultValue": "Application"
         },
         "environment": {
             "type": "string",
-            "value": "Environment"
+            "defaultValue": "Environment"
         },
         "businessUnit": {
             "type": "string",
-            "value": "BusinessUnit"
+            "defaultValue": "BusinessUnit"
         },
         "costCenter": {
             "type": "string",
-            "value": "CostCenter"
+            "defaultValue": "CostCenter"
         },
         "publicIpAddressName": {
             "type": "string",
-            "value": "testname-ip"
+            "defaultValue": "testname-ip"
         },
         "publicIpAddressType": {
             "type": "string",
-            "value": "Dynamic"
+            "defaultValue": "Dynamic"
         },
         "publicIpAddressSku": {
             "type": "string",
-            "value": "Basic"
+            "defaultValue": "Basic"
         },
         "virtualMachineName": {
             "type": "string",
-            "value": "testname"
+            "defaultValue": "testname"
         },
         "virtualMachineRG": {
             "type": "string",
-            "value": "rg-morrisa"
+            "defaultValue": "rg-morrisa"
         },
         "osDiskType": {
             "type": "string",
-            "value": "StandardSSD_LRS"
+            "defaultValue": "StandardSSD_LRS"
         },
         "virtualMachineSize": {
             "type": "string",
-            "value": "Standard_D2_v3"
+            "defaultValue": "Standard_D2_v3"
         },
         "adminUsername": {
             "type": "string",
-            "value": "psjhadm"
+            "defaultValue": "psjhadm"
         },
         "virtualMachineAdminPassword": {
             "type": "securestring",
-            "value": null
+            "defaultValue": null
         },
         "diagnosticsStorageAccountName": {
             "type": "string",
-            "value": "rgmorrisadiag"
+            "defaultValue": "rgmorrisadiag"
         },
         "diagnosticsStorageAccountId": {
             "type": "string",
-            "value": "Microsoft.Storage/storageAccounts/rgmorrisadiag"
+            "defaultValue": "Microsoft.Storage/storageAccounts/rgmorrisadiag"
         },
         "diagnosticsStorageAccountType": {
             "type": "string",
-            "value": "Standard_LRS"
+            "defaultValue": "Standard_LRS"
         },
         "diagnosticsStorageAccountKind": {
             "type": "string",
-            "value": "Storage"
+            "defaultValue": "Storage"
         }
     },
     "variables": {
