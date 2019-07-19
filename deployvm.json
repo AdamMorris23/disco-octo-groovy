@@ -1,142 +1,79 @@
-{
+{{
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "location": {
-            "type": "string",
-            "defaultValue": "westus2"
+        "VMSize": {
+            "type": "string"
         },
-        "networkInterfaceName": {
-            "type": "string",
-            "defaultValue": "testname623"
+        "VMAdminName": {
+            "type": "string"
         },
-        "networkSecurityGroupName": {
-            "type": "string",
-            "defaultValue": "testname-nsg"
+        "VMAdminPassword": {
+            "type": "securestring"
         },
-        "networkSecurityGroupRules": {
-            "type": "array",
-            "defaultValue": []
+        "VirtualNetwork": {
+            "type": "string"
         },
-        "subnetName": {
-            "type": "string",
-            "defaultValue": "default"
+        "SubnetName": {
+            "type": "string"
         },
-        "virtualNetworkName": {
-            "type": "string",
-            "defaultValue": "rg-morrisa-vnet"
+        "SubnetAddresses": {
+            "type": "array"
         },
-        "addressPrefixes": {
-            "type": "array",
-            "defaultValue": [
-                "10.1.5.0/24"
-            ]
+        "Location": {
+            "type": "string"
         },
-        "subnets": {
-            "type": "array",
-            "defaultValue": [
-                {
-                    "name": "default",
-                    "properties": {
-                        "addressPrefix": "10.1.5.0/24"
-                    }
-                }
-            ]
+        "OSPublisher": {
+            "type": "string"
         },
-        "operatingSystem": {
-            "type": "string",
-            "defaultValue": "Linux"
+        "OSOffer": {
+            "type": "string"
         },
-        "application": {
-            "type": "string",
-            "defaultValue": "Application"
+        "OSSKU": {
+            "type": "string"
         },
-        "environment": {
-            "type": "string",
-            "defaultValue": "Environment"
+        "OSVersion": {
+            "type": "string"
         },
-        "businessUnit": {
-            "type": "string",
-            "defaultValue": "BusinessUnit"
-        },
-        "costCenter": {
-            "type": "string",
-            "defaultValue": "CostCenter"
-        },
-        "publicIpAddressName": {
-            "type": "string",
-            "defaultValue": "testname-ip"
-        },
-        "publicIpAddressType": {
-            "type": "string",
-            "defaultValue": "Dynamic"
-        },
-        "publicIpAddressSku": {
-            "type": "string",
-            "defaultValue": "Basic"
-        },
-        "virtualMachineName": {
-            "type": "string",
-            "defaultValue": "testname"
-        },
-        "virtualMachineRG": {
-            "type": "string",
-            "defaultValue": "rg-morrisa"
-        },
-        "osDiskType": {
-            "type": "string",
-            "defaultValue": "StandardSSD_LRS"
-        },
-        "virtualMachineSize": {
-            "type": "string",
-            "defaultValue": "Standard_D2_v3"
-        },
-        "adminUsername": {
-            "type": "string",
-            "defaultValue": "psjhadm"
-        },
-        "virtualMachineAdminPassword": {
-            "type": "securestring",
-            "defaultValue": null
-        },
-        "diagnosticsStorageAccountName": {
-            "type": "string",
-            "defaultValue": "rgmorrisadiag"
-        },
-        "diagnosticsStorageAccountId": {
-            "type": "string",
-            "defaultValue": "Microsoft.Storage/storageAccounts/rgmorrisadiag"
-        },
-        "diagnosticsStorageAccountType": {
-            "type": "string",
-            "defaultValue": "Standard_LRS"
-        },
-        "diagnosticsStorageAccountKind": {
-            "type": "string",
-            "defaultValue": "Storage"
+        "tags": {
+            "type": "object",
+            "defaultValue": {
+                "Environment": "",
+                "CostCenter": "",
+                "BusinessUnit": "",
+                "Application": ""
+            }
         }
     },
     "variables": {
-        "nsgId": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]",
-        "vnetId": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
-        "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]"
+        "VMStub": "[uniqueString(resourceGroup().id, deployment().name)]",
+        "VMName": "[concat('vm-', variables('VMStub'))]",
+        "networkInterfaceName": "[concat('nic-', variables('VMStub'))]",
+        "networkSecurityGroupName": "[concat('nsg-', variables('VMStub'))]",
+        "networkSecurityGroupRules": [],
+        "nsgId": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]",
+        "vnetId": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks', parameters('virtualNetwork'))]",
+        "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
+        "publicIpAddressName": "[concat('ip-', variables('VMName'))]",
+        "diagnosticsStorageAccountName": "rgmorrisadiag",
+        "diagnosticsStorageAccountType": "Standard_LRS",
+        "diagnosticsStorageAccountKind": "Storage",
+        "publicIpAddressType": "Dynamic",
+        "publicIpAddressSku": "Basic",
+        "osDiskType": "StandardSSD_LRS"
     },
+
     "resources": [
         {
-            "name": "[parameters('networkInterfaceName')]",
+            "name": "[variables('networkInterfaceName')]",
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2018-10-01",
-            "location": "[parameters('location')]",
-            "tags": {
-                "Application": "[parameters('application')]",
-                "Environment": "[parameters('environment')]",
-                "BusinessUnit": "[parameters('businessUnit')]",
-                "CostCenter": "[parameters('costCenter')]"
-            },
+            "location": "[parameters('Location')]",
+            "tags": "[parameters('tags')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]",
-                "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
-                "[concat('Microsoft.Network/publicIpAddresses/', parameters('publicIpAddressName'))]"
+                "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetwork'))]",
+                "[concat('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -148,7 +85,7 @@
                             },
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIpAddress": {
-                                "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIpAddresses', parameters('publicIpAddressName'))]"
+                                "id": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIpAddresses', variables('publicIpAddressName'))]"
                             }
                         }
                     }
@@ -159,131 +96,106 @@
             }
         },
         {
-            "name": "[parameters('networkSecurityGroupName')]",
+            "name": "[variables('networkSecurityGroupName')]",
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2019-02-01",
-            "location": "[parameters('location')]",
-            "tags": {
-                "Application": "[parameters('application')]",
-                "Environment": "[parameters('environment')]",
-                "BusinessUnit": "[parameters('businessUnit')]",
-                "CostCenter": "[parameters('costCenter')]"
-            },
+            "location": "[parameters('Location')]",
+            "tags": "[parameters('tags')]",
             "properties": {
-                "securityRules": "[parameters('networkSecurityGroupRules')]"
+                "securityRules": "[variables('networkSecurityGroupRules')]"
             }
         },
         {
-            "name": "[parameters('virtualNetworkName')]",
+            "name": "[parameters('virtualNetwork')]",
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2019-04-01",
             "location": "[parameters('location')]",
-            "tags": {
-                "Application": "[parameters('application')]",
-                "Environment": "[parameters('environment')]",
-                "BusinessUnit": "[parameters('businessUnit')]",
-                "CostCenter": "[parameters('costCenter')]"
-            },
+            "tags": "[parameters('tags')]",
             "properties": {
                 "addressSpace": {
-                    "addressPrefixes": "[parameters('addressPrefixes')]"
+                    "addressPrefixes": "[parameters('subnetAddresses')]"
                 },
-                "subnets": "[parameters('subnets')]"
+                "subnets": "[parameters('subnetName')]"
             }
         },
         {
-            "name": "[parameters('publicIpAddressName')]",
+            "name": "[variables('publicIpAddressName')]",
             "type": "Microsoft.Network/publicIpAddresses",
             "apiVersion": "2019-02-01",
             "location": "[parameters('location')]",
-            "tags": {
-                "Application": "[parameters('application')]",
-                "Environment": "[parameters('environment')]",
-                "BusinessUnit": "[parameters('businessUnit')]",
-                "CostCenter": "[parameters('costCenter')]"
-            },
+            "tags": "[parameters('tags')]",
             "properties": {
-                "publicIpAllocationMethod": "[parameters('publicIpAddressType')]"
+                "publicIpAllocationMethod": "[variables('publicIpAddressType')]"
             },
             "sku": {
-                "name": "[parameters('publicIpAddressSku')]"
+                "name": "[variables('publicIpAddressSku')]"
             }
         },
         {
-            "name": "[parameters('virtualMachineName')]",
+            "name": "[variables('VMName')]",
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2018-10-01",
             "location": "[parameters('location')]",
-            "tags": {
-                "Application": "[parameters('application')]",
-                "Environment": "[parameters('environment')]",
-                "BusinessUnit": "[parameters('businessUnit')]",
-                "CostCenter": "[parameters('costCenter')]"
-            },
+            "tags": "[parameters('tags')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/networkInterfaces/', parameters('networkInterfaceName'))]",
-                "[concat('Microsoft.Storage/storageAccounts/', parameters('diagnosticsStorageAccountName'))]"
+                "[concat('Microsoft.Network/networkInterfaces/', variables('networkInterfaceName'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', variables('diagnosticsStorageAccountName'))]"
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[parameters('virtualMachineSize')]"
+                    "vmSize": "[parameters('VMSize')]"
                 },
                 "storageProfile": {
                     "osDisk": {
                         "createOption": "FromImage",
                         "managedDisk": {
-                            "storageAccountType": "[parameters('osDiskType')]"
+                            "storageAccountType": "[variables('osDiskType')]"
                         }
                     },
                     "imageReference": {
-                        "publisher": "RedHat",
-                        "offer": "RHEL",
-                        "sku": "7.3",
-                        "version": "latest"
+                        "publisher": "[parameters('OSPublisher')]",
+                        "offer": "[parameters('OSOffer')]",
+                        "sku": "[parameters('OSSKU')]",
+                        "version": "[parameters('OSVersion')]"
                     }
                 },
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaceName'))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
                         }
                     ]
                 },
                 "osProfile": {
-                    "computerName": "[parameters('virtualMachineName')]",
-                    "adminUsername": "[parameters('adminUsername')]",
-                    "adminPassword": "[parameters('virtualMachineAdminPassword')]"
+                    "computerName": "[variables('VMName')]",
+                    "adminUsername": "[parameters('VMAdminName')]",
+                    "adminPassword": "[parameters('VMAdminPassword')]"
                 },
                 "diagnosticsProfile": {
                     "bootDiagnostics": {
                         "enabled": true,
-                        "storageUri": "[concat('https://', parameters('diagnosticsStorageAccountName'), '.blob.core.windows.net/')]"
+                        "storageUri": "[concat('https://', variables('diagnosticsStorageAccountName'), '.blob.core.windows.net/')]"
                     }
                 }
             }
         },
         {
-            "name": "[parameters('diagnosticsStorageAccountName')]",
+            "name": "[variables('diagnosticsStorageAccountName')]",
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2018-07-01",
             "location": "[parameters('location')]",
-            "tags": {
-                "Application": "[parameters('application')]",
-                "Environment": "[parameters('environment')]",
-                "BusinessUnit": "[parameters('businessUnit')]",
-                "CostCenter": "[parameters('costCenter')]"
-            },
+            "tags": "[parameters('tags')]",
             "properties": {},
-            "kind": "[parameters('diagnosticsStorageAccountKind')]",
+            "kind": "[variables('diagnosticsStorageAccountKind')]",
             "sku": {
-                "name": "[parameters('diagnosticsStorageAccountType')]"
+                "name": "[variables('diagnosticsStorageAccountType')]"
             }
         }
     ],
     "outputs": {
         "adminUsername": {
             "type": "string",
-            "value": "[parameters('adminUsername')]"
+            "value": "[parameters('VMAdminName')]"
         }
     }
 }
