@@ -55,10 +55,10 @@
         "vnetId": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks', parameters('virtualNetwork'))]",
         "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
         "subnets": {
-            "name": "[parameters('subnetName')]",
+            "name": "default",
             "properties": {
-                "addressPrefix": "[parameters('subnetAddresses')]"
-            }
+                "addressPrefix": "10.1.5.0/24"
+           }
         },
         "publicIpAddressName": "[concat('ip-', variables('VMName'))]",
         "diagnosticsStorageAccountName": "rgmorrisadiag",
