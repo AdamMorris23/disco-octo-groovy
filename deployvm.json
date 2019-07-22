@@ -18,7 +18,7 @@
             "type": "string"
         },
         "SubnetAddresses": {
-            "type": "array"
+            "type": "string"
         },
         "Location": {
             "type": "string"
