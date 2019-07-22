@@ -54,6 +54,12 @@
         "nsgId": "[resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]",
         "vnetId": "[resourceId(resourceGroup().name,'Microsoft.Network/virtualNetworks', parameters('virtualNetwork'))]",
         "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
+        "subnets": {
+            "name": "[parameters('subnetName')]",
+            "properties": {
+                "addressPrefix": "[parameters('subnetAddresses')]"
+            }
+        },
         "publicIpAddressName": "[concat('ip-', variables('VMName'))]",
         "diagnosticsStorageAccountName": "rgmorrisadiag",
         "diagnosticsStorageAccountType": "Standard_LRS",
@@ -84,7 +90,7 @@
                 "addressSpace": {
                     "addressPrefixes": "[parameters('subnetAddresses')]"
                 },
-                "subnets": "[parameters('subnetName')]"
+                "subnets": "[variables('subnets')]"
             }
         },
         {
