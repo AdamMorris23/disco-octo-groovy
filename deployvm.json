@@ -82,7 +82,9 @@
             "tags": "[parameters('tags')]",
             "properties": {
                 "addressSpace": {
-                    "addressPrefixes": "[parameters('subnetAddresses')]"
+                    "addressPrefixes": [
+                        "[parameters('subnetAddresses')]"
+                    ]
                 },
                 "subnets": [
                     {
