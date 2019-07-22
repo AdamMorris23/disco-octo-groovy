@@ -85,12 +85,10 @@
                     "addressPrefixes": "[parameters('subnetAddresses')]"
                 },
                 "subnets": [
-                    {
-                        "name": "default",
-                        "properties": {
-                            "addressPrefixes": "10.1.5.0/24"
+                    "name": "default",
+                    "properties": {
+                        "addressPrefix": "10.1.5.0/24"
                         }
-                    }
                 ]
             }
         },
